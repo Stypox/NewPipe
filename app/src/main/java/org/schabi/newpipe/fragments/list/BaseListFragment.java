@@ -17,12 +17,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.extractor.InfoItem;
-import org.schabi.newpipe.extractor.channel.ChannelInfoItem;
-import org.schabi.newpipe.extractor.comments.CommentsInfoItem;
-import org.schabi.newpipe.extractor.playlist.PlaylistInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.fragments.BaseStateFragment;
@@ -30,6 +28,7 @@ import org.schabi.newpipe.fragments.OnScrollBelowItemsListener;
 import org.schabi.newpipe.info_list.InfoItemDialog;
 import org.schabi.newpipe.info_list.InfoListAdapter;
 import org.schabi.newpipe.report.ErrorActivity;
+import org.schabi.newpipe.util.ToolbarBelowItemAnimation;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.OnClickGesture;
 import org.schabi.newpipe.util.StateSaver;
@@ -194,42 +193,31 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I> implem
             }
         });
 
-        infoListAdapter.setOnChannelSelectedListener(new OnClickGesture<ChannelInfoItem>() {
-            @Override
-            public void selected(ChannelInfoItem selectedItem) {
-                try {
-                    onItemSelected(selectedItem);
-                    NavigationHelper.openChannelFragment(getFM(),
-                            selectedItem.getServiceId(),
-                            selectedItem.getUrl(),
-                            selectedItem.getName());
-                } catch (Exception e) {
-                    ErrorActivity.reportUiError((AppCompatActivity) getActivity(), e);
-                }
-            }
-        });
-
-        infoListAdapter.setOnPlaylistSelectedListener(new OnClickGesture<PlaylistInfoItem>() {
-            @Override
-            public void selected(PlaylistInfoItem selectedItem) {
-                try {
-                    onItemSelected(selectedItem);
-                    NavigationHelper.openPlaylistFragment(getFM(),
-                            selectedItem.getServiceId(),
-                            selectedItem.getUrl(),
-                            selectedItem.getName());
-                } catch (Exception e) {
-                    ErrorActivity.reportUiError((AppCompatActivity) getActivity(), e);
-                }
-            }
-        });
-
-        infoListAdapter.setOnCommentsSelectedListener(new OnClickGesture<CommentsInfoItem>() {
-            @Override
-            public void selected(CommentsInfoItem selectedItem) {
+        infoListAdapter.setOnChannelSelectedListener((selectedItem) -> {
+            try {
                 onItemSelected(selectedItem);
+                NavigationHelper.openChannelFragment(getFM(),
+                        selectedItem.getServiceId(),
+                        selectedItem.getUrl(),
+                        selectedItem.getName());
+            } catch (Exception e) {
+                ErrorActivity.reportUiError((AppCompatActivity) getActivity(), e);
             }
         });
+
+        infoListAdapter.setOnPlaylistSelectedListener((selectedItem) -> {
+            try {
+                onItemSelected(selectedItem);
+                NavigationHelper.openPlaylistFragment(getFM(),
+                        selectedItem.getServiceId(),
+                        selectedItem.getUrl(),
+                        selectedItem.getName());
+            } catch (Exception e) {
+                ErrorActivity.reportUiError((AppCompatActivity) getActivity(), e);
+            }
+        });
+
+        infoListAdapter.setOnCommentsSelectedListener((selectedItem) -> onItemSelected(selectedItem));
 
         itemsList.clearOnScrollListeners();
         itemsList.addOnScrollListener(new OnScrollBelowItemsListener() {

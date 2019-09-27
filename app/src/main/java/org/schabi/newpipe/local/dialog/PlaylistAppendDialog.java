@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import org.schabi.newpipe.NewPipeDatabase;
 import org.schabi.newpipe.R;
-import org.schabi.newpipe.database.LocalItem;
 import org.schabi.newpipe.database.playlist.PlaylistMetadataEntry;
 import org.schabi.newpipe.database.stream.model.StreamEntity;
 import org.schabi.newpipe.extractor.stream.StreamInfo;
@@ -20,7 +19,6 @@ import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.local.LocalItemListAdapter;
 import org.schabi.newpipe.local.playlist.LocalPlaylistManager;
 import org.schabi.newpipe.player.playqueue.PlayQueueItem;
-import org.schabi.newpipe.util.OnClickGesture;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,14 +79,11 @@ public final class PlaylistAppendDialog extends PlaylistDialog {
                 new LocalPlaylistManager(NewPipeDatabase.getInstance(getContext()));
 
         playlistAdapter = new LocalItemListAdapter(getActivity());
-        playlistAdapter.setSelectedListener(new OnClickGesture<LocalItem>() {
-            @Override
-            public void selected(LocalItem selectedItem) {
-                if (!(selectedItem instanceof PlaylistMetadataEntry) || getStreams() == null)
-                    return;
-                onPlaylistSelected(playlistManager, (PlaylistMetadataEntry) selectedItem,
-                        getStreams());
-            }
+        playlistAdapter.setSelectedListener((selectedItem) -> {
+            if (!(selectedItem instanceof PlaylistMetadataEntry) || getStreams() == null)
+                return;
+            onPlaylistSelected(playlistManager, (PlaylistMetadataEntry) selectedItem,
+                    getStreams());
         });
 
         playlistRecyclerView = view.findViewById(R.id.playlist_list);
