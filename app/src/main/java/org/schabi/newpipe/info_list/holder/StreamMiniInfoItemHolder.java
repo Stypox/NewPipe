@@ -3,7 +3,9 @@ package org.schabi.newpipe.info_list.holder;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.schabi.newpipe.R;
@@ -16,17 +18,23 @@ import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.util.AnimationUtils;
 import org.schabi.newpipe.util.ImageDisplayConstants;
 import org.schabi.newpipe.util.Localization;
+import org.schabi.newpipe.util.ToolbarBelowItemAnimation;
+import org.schabi.newpipe.util.ToolbarOverlayItemAnimation;
 import org.schabi.newpipe.views.AnimatedProgressBar;
 
 import java.util.concurrent.TimeUnit;
 
 public class StreamMiniInfoItemHolder extends InfoItemHolder {
+    private static final int expandAnimationDuration = 100; // ms
 
     public final ImageView itemThumbnailView;
     public final TextView itemVideoTitleView;
     public final TextView itemUploaderView;
     public final TextView itemDurationView;
     public final AnimatedProgressBar itemProgressView;
+
+    public final LinearLayout itemToolbarView;
+    public final boolean isItemToolbarOverlay;
 
     StreamMiniInfoItemHolder(InfoItemBuilder infoItemBuilder, int layoutId, ViewGroup parent) {
         super(infoItemBuilder, layoutId, parent);
@@ -36,6 +44,16 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         itemUploaderView = itemView.findViewById(R.id.itemUploaderView);
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
         itemProgressView = itemView.findViewById(R.id.itemProgressView);
+
+        LinearLayout itemToolbarView = itemView.findViewById(R.id.toolbarBelowItem);
+        if (itemToolbarView == null) {
+            itemToolbarView = itemView.findViewById(R.id.toolbarOverlayItem);
+            isItemToolbarOverlay = true;
+        } else {
+            isItemToolbarOverlay = false;
+        }
+
+        this.itemToolbarView = itemToolbarView;
     }
 
     public StreamMiniInfoItemHolder(InfoItemBuilder infoItemBuilder, ViewGroup parent) {
@@ -49,6 +67,12 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
 
         itemVideoTitleView.setText(item.getName());
         itemUploaderView.setText(item.getUploaderName());
+
+        if (isItemToolbarOverlay) {
+            ToolbarOverlayItemAnimation.resetToolbarOverlayItem(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView);
+        } else {
+            ToolbarBelowItemAnimation.resetToolbarBelowItem(itemToolbarView);
+        }
 
         if (item.getDuration() > 0) {
             itemDurationView.setText(Localization.getDurationString(item.getDuration()));
@@ -82,6 +106,12 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
                         ImageDisplayConstants.DISPLAY_THUMBNAIL_OPTIONS);
 
         itemView.setOnClickListener(view -> {
+            if (itemBuilder.getOnStreamSelectedListener() != null) {
+                toggleItemToolbar();
+            }
+        });
+
+        itemThumbnailView.setOnClickListener(v -> {
             if (itemBuilder.getOnStreamSelectedListener() != null) {
                 itemBuilder.getOnStreamSelectedListener().selected(item);
             }
@@ -133,5 +163,15 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
     private void disableLongClick() {
         itemView.setLongClickable(false);
         itemView.setOnLongClickListener(null);
+    }
+
+    private void toggleItemToolbar() {
+        Animation animation;
+        if (isItemToolbarOverlay) {
+            animation = new ToolbarOverlayItemAnimation(expandAnimationDuration, itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView);
+        } else {
+            animation = new ToolbarBelowItemAnimation(expandAnimationDuration, itemToolbarView);
+        }
+        itemToolbarView.startAnimation(animation);
     }
 }
