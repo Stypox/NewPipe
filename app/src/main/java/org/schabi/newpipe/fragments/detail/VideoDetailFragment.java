@@ -1167,28 +1167,10 @@ public class VideoDetailFragment
 
 
     public void openDownloadDialog() {
-            try {
-                DownloadDialog downloadDialog = DownloadDialog.newInstance(currentInfo);
-                downloadDialog.setVideoStreams(sortedVideoStreams);
-                downloadDialog.setAudioStreams(currentInfo.getAudioStreams());
-                downloadDialog.setSelectedVideoStream(selectedVideoStreamIndex);
-                downloadDialog.setSubtitleStreams(currentInfo.getSubtitles());
-
-                downloadDialog.show(getActivity().getSupportFragmentManager(), "downloadDialog");
-            } catch (Exception e) {
-                ErrorActivity.ErrorInfo info = ErrorActivity.ErrorInfo.make(UserAction.UI_ERROR,
-                        ServiceList.all()
-                                .get(currentInfo
-                                        .getServiceId())
-                                .getServiceInfo()
-                                .getName(), "",
-                        R.string.could_not_setup_download_menu);
-
-                ErrorActivity.reportError(getActivity(),
-                        e,
-                        getActivity().getClass(),
-                        getActivity().findViewById(android.R.id.content), info);
-            }
+        NavigationHelper.openDownloadDialog(this,
+                currentInfo,
+                sortedVideoStreams,
+                selectedVideoStreamIndex);
     }
 
     /*//////////////////////////////////////////////////////////////////////////

@@ -24,7 +24,9 @@ import org.schabi.newpipe.R;
 import org.schabi.newpipe.RouterActivity;
 import org.schabi.newpipe.about.AboutActivity;
 import org.schabi.newpipe.download.DownloadActivity;
+import org.schabi.newpipe.download.DownloadDialog;
 import org.schabi.newpipe.extractor.NewPipe;
+import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.stream.AudioStream;
@@ -52,9 +54,12 @@ import org.schabi.newpipe.player.PopupVideoPlayer;
 import org.schabi.newpipe.player.PopupVideoPlayerActivity;
 import org.schabi.newpipe.player.VideoPlayer;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
+import org.schabi.newpipe.report.ErrorActivity;
+import org.schabi.newpipe.report.UserAction;
 import org.schabi.newpipe.settings.SettingsActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class NavigationHelper {
@@ -231,6 +236,34 @@ public class NavigationHelper {
             } else {
                 Toast.makeText(context, R.string.no_player_found_toast, Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Download
+    ////////////////////////////////////////////////////////////////////////////
+
+    public static void openDownloadDialog(Fragment fragment, StreamInfo info, List<VideoStream> sortedVideoStreams, int selectedVideoStreamIndex) {
+        try {
+            DownloadDialog downloadDialog = DownloadDialog.newInstance(info);
+            downloadDialog.setVideoStreams(sortedVideoStreams);
+            downloadDialog.setAudioStreams(info.getAudioStreams());
+            downloadDialog.setSelectedVideoStream(selectedVideoStreamIndex);
+            downloadDialog.setSubtitleStreams(info.getSubtitles());
+
+            downloadDialog.show(fragment.requireFragmentManager(), "downloadDialog");
+        } catch (Exception e) {
+            ErrorActivity.ErrorInfo errorInfo = ErrorActivity.ErrorInfo.make(UserAction.UI_ERROR,
+                    ServiceList.all()
+                            .get(info.getServiceId())
+                            .getServiceInfo()
+                            .getName(), "",
+                    R.string.could_not_setup_download_menu);
+
+            ErrorActivity.reportError(fragment.requireActivity(),
+                    e,
+                    fragment.getClass(),
+                    fragment.requireActivity().findViewById(android.R.id.content), errorInfo);
         }
     }
 
