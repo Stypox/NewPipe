@@ -49,10 +49,8 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.ReCaptchaActivity;
-import org.schabi.newpipe.download.DownloadDialog;
 import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.NewPipe;
-import org.schabi.newpipe.extractor.ServiceList;
 import org.schabi.newpipe.extractor.exceptions.ContentNotAvailableException;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
@@ -1167,10 +1165,7 @@ public class VideoDetailFragment
 
 
     public void openDownloadDialog() {
-        NavigationHelper.openDownloadDialog(this,
-                currentInfo,
-                sortedVideoStreams,
-                selectedVideoStreamIndex);
+        NavigationHelper.openDownloadDialog(getActivity(), currentInfo, sortedVideoStreams, selectedVideoStreamIndex, null);
     }
 
     /*//////////////////////////////////////////////////////////////////////////

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -263,7 +264,7 @@ public class NavigationHelper {
                 activity.findViewById(android.R.id.content), errorInfo);
     }
 
-    public static void openDownloadDialog(FragmentActivity activity, StreamInfo info, List<VideoStream> sortedVideoStreams, int selectedVideoStreamIndex) {
+    public static void openDownloadDialog(FragmentActivity activity, StreamInfo info, List<VideoStream> sortedVideoStreams, int selectedVideoStreamIndex, @Nullable DialogInterface.OnDismissListener onDismissListener) {
         try {
             DownloadDialog downloadDialog = DownloadDialog.newInstance(info);
             downloadDialog.setVideoStreams(sortedVideoStreams);
@@ -272,12 +273,16 @@ public class NavigationHelper {
             downloadDialog.setSubtitleStreams(info.getSubtitles());
 
             downloadDialog.show(activity.getSupportFragmentManager(), "downloadDialog");
+            if (onDismissListener != null) {
+                activity.getSupportFragmentManager().executePendingTransactions();
+                downloadDialog.getDialog().setOnDismissListener(onDismissListener);
+            }
         } catch (Exception e) {
             showDownloadDialogError(activity, info.getServiceId(), e);
         }
     }
 
-    public static void openDownloadDialog(FragmentActivity activity, StreamInfo info) {
+    public static void openDownloadDialog(FragmentActivity activity, StreamInfo info, @Nullable DialogInterface.OnDismissListener onDismissListener) {
         try {
             List<VideoStream> sortedVideoStreams = ListHelper.getSortedStreamVideosList(
                     activity,
@@ -289,18 +294,18 @@ public class NavigationHelper {
                     activity,
                     sortedVideoStreams);
 
-            openDownloadDialog(activity, info, sortedVideoStreams, selectedVideoStreamIndex);
+            openDownloadDialog(activity, info, sortedVideoStreams, selectedVideoStreamIndex, onDismissListener);
         } catch (Exception e) {
             showDownloadDialogError(activity, info.getServiceId(), e);
         }
     }
 
     @NonNull
-    public static Disposable openDownloadDialog(FragmentActivity activity, @NonNull StreamInfoItem infoItem) {
+    public static Disposable openDownloadDialog(FragmentActivity activity, @NonNull StreamInfoItem infoItem, @Nullable DialogInterface.OnDismissListener onDismissListener) {
         return ExtractorHelper.getStreamInfo(infoItem.getServiceId(), infoItem.getUrl(), true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> NavigationHelper.openDownloadDialog(activity, result),
+                .subscribe(result -> NavigationHelper.openDownloadDialog(activity, result, onDismissListener),
                         e -> showDownloadDialogError(activity, infoItem.getServiceId(), e));
     }
 

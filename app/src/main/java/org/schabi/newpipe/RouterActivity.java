@@ -26,7 +26,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import org.schabi.newpipe.download.DownloadDialog;
 import org.schabi.newpipe.extractor.Info;
 import org.schabi.newpipe.extractor.NewPipe;
 import org.schabi.newpipe.extractor.StreamingService;
@@ -35,7 +34,6 @@ import org.schabi.newpipe.extractor.channel.ChannelInfo;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.playlist.PlaylistInfo;
 import org.schabi.newpipe.extractor.stream.StreamInfo;
-import org.schabi.newpipe.extractor.stream.VideoStream;
 import org.schabi.newpipe.player.playqueue.ChannelPlayQueue;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
 import org.schabi.newpipe.player.playqueue.PlaylistPlayQueue;
@@ -43,7 +41,6 @@ import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
 import org.schabi.newpipe.report.UserAction;
 import org.schabi.newpipe.util.Constants;
 import org.schabi.newpipe.util.ExtractorHelper;
-import org.schabi.newpipe.util.ListHelper;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.PermissionHelper;
 import org.schabi.newpipe.util.ThemeHelper;
@@ -425,27 +422,8 @@ public class RouterActivity extends AppCompatActivity {
         ExtractorHelper.getStreamInfo(currentServiceId, currentUrl, true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((@NonNull StreamInfo result) -> {
-                    List<VideoStream> sortedVideoStreams = ListHelper.getSortedStreamVideosList(this,
-                            result.getVideoStreams(),
-                            result.getVideoOnlyStreams(),
-                            false);
-                    int selectedVideoStreamIndex = ListHelper.getDefaultResolutionIndex(this,
-                            sortedVideoStreams);
-
-                    android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
-                    DownloadDialog downloadDialog = DownloadDialog.newInstance(result);
-                    downloadDialog.setVideoStreams(sortedVideoStreams);
-                    downloadDialog.setAudioStreams(result.getAudioStreams());
-                    downloadDialog.setSelectedVideoStream(selectedVideoStreamIndex);
-                    downloadDialog.show(fm, "downloadDialog");
-                    fm.executePendingTransactions();
-                    downloadDialog.getDialog().setOnDismissListener(dialog -> {
-                        finish();
-                    });
-                }, (@NonNull Throwable throwable) -> {
-                    onError();
-                });
+                .subscribe(result -> NavigationHelper.openDownloadDialog(this, result, dialog -> finish()),
+                        e -> onError());
     }
 
     @Override
