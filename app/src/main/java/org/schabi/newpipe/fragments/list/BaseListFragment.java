@@ -193,7 +193,7 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I> implem
                 showStreamDialog(selectedItem);
             }
         });
-        infoListAdapter.setStreamToolbarListener(streamToolbarListener);
+        infoListAdapter.setStreamSelectedListener(streamToolbarListener);
 
         infoListAdapter.setOnChannelSelectedListener((selectedItem) -> {
             try {

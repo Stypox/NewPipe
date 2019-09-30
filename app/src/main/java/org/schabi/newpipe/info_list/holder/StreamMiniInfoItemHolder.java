@@ -14,7 +14,7 @@ import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.info_list.InfoItemBuilder;
-import org.schabi.newpipe.info_list.InfoItemToolbarHelper;
+import org.schabi.newpipe.info_list.InfoItemHolderUtils;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.util.AnimationUtils;
 import org.schabi.newpipe.util.ImageDisplayConstants;
@@ -27,16 +27,12 @@ import org.schabi.newpipe.views.AnimatedProgressBar;
 import java.util.concurrent.TimeUnit;
 
 public class StreamMiniInfoItemHolder extends InfoItemHolder {
-    private static final int expandAnimationDuration = 100; // ms
-
     public final ImageView itemThumbnailView;
     public final TextView itemVideoTitleView;
     public final TextView itemUploaderView;
     public final TextView itemDurationView;
     public final AnimatedProgressBar itemProgressView;
-
     public final LinearLayout itemToolbarView;
-    public final boolean isItemToolbarOverlay;
 
     StreamMiniInfoItemHolder(InfoItemBuilder infoItemBuilder, int layoutId, ViewGroup parent) {
         super(infoItemBuilder, layoutId, parent);
@@ -46,16 +42,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         itemUploaderView = itemView.findViewById(R.id.itemUploaderView);
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
         itemProgressView = itemView.findViewById(R.id.itemProgressView);
-
-        LinearLayout itemToolbarView = itemView.findViewById(R.id.toolbarBelowItem);
-        if (itemToolbarView == null) {
-            itemToolbarView = itemView.findViewById(R.id.toolbarOverlayItem);
-            isItemToolbarOverlay = true;
-        } else {
-            isItemToolbarOverlay = false;
-        }
-
-        this.itemToolbarView = itemToolbarView;
+        itemToolbarView = InfoItemHolderUtils.getToolbarViewFromItem(itemView);
     }
 
     public StreamMiniInfoItemHolder(InfoItemBuilder infoItemBuilder, ViewGroup parent) {
@@ -69,12 +56,6 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
 
         itemVideoTitleView.setText(item.getName());
         itemUploaderView.setText(item.getUploaderName());
-
-        if (isItemToolbarOverlay) {
-            ToolbarOverlayItemAnimation.resetToolbarOverlayItem(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView);
-        } else {
-            ToolbarBelowItemAnimation.resetToolbarBelowItem(itemToolbarView);
-        }
 
         if (item.getDuration() > 0) {
             itemDurationView.setText(Localization.getDurationString(item.getDuration()));
@@ -107,22 +88,18 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
                         itemThumbnailView,
                         ImageDisplayConstants.DISPLAY_THUMBNAIL_OPTIONS);
 
-        itemView.setOnClickListener(v -> toggleItemToolbar());
-        itemThumbnailView.setOnClickListener(v -> {
-            final OnClickGesture<StreamInfoItem> itemSelectedListener = itemBuilder.getStreamToolbarListener().getItemSelectedListener();
-            if (itemSelectedListener != null) {
-                itemSelectedListener.selected(item);
-            }
-        });
+        InfoItemHolderUtils.resetItemToolbarView(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView);
 
-        InfoItemToolbarHelper.setListenersOrHideToolbarButtons(itemView, itemBuilder.getStreamToolbarListener(), item);
+        itemView.setOnClickListener(v -> InfoItemHolderUtils.toggleItemToolbar(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView));
+        InfoItemHolderUtils.setClickListener(itemBuilder.getStreamSelectedListener(), item, itemThumbnailView);
+        InfoItemHolderUtils.setListenersOrHideToolbarButtons(itemView, itemBuilder.getStreamSelectedListener(), item);
 
         switch (item.getStreamType()) {
             case AUDIO_STREAM:
             case VIDEO_STREAM:
             case LIVE_STREAM:
             case AUDIO_LIVE_STREAM:
-                enableLongClick(item);
+                InfoItemHolderUtils.setLongClickListener(itemBuilder.getStreamSelectedListener(), item, itemView, itemThumbnailView);
                 break;
             case FILE:
             case NONE:
@@ -150,37 +127,11 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         }
     }
 
-    private void enableLongClick(final StreamInfoItem item) {
-        View.OnLongClickListener onLongClickListener = v -> {
-            final OnClickGesture<StreamInfoItem> itemSelectedListener = itemBuilder.getStreamToolbarListener().getItemSelectedListener();
-            if (itemSelectedListener != null) {
-                itemSelectedListener.held(item);
-            }
-            return true;
-        };
-
-        itemView.setLongClickable(true);
-        itemView.setOnLongClickListener(onLongClickListener);
-
-        itemThumbnailView.setLongClickable(true);
-        itemThumbnailView.setOnLongClickListener(onLongClickListener);
-    }
-
     private void disableLongClick() {
         itemView.setLongClickable(false);
         itemView.setOnLongClickListener(null);
 
         itemThumbnailView.setLongClickable(false);
         itemThumbnailView.setOnLongClickListener(null);
-    }
-
-    private void toggleItemToolbar() {
-        Animation animation;
-        if (isItemToolbarOverlay) {
-            animation = new ToolbarOverlayItemAnimation(expandAnimationDuration, itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView);
-        } else {
-            animation = new ToolbarBelowItemAnimation(expandAnimationDuration, itemToolbarView);
-        }
-        itemToolbarView.startAnimation(animation);
     }
 }

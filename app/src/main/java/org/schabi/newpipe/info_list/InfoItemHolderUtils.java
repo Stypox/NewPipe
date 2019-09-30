@@ -2,11 +2,18 @@ package org.schabi.newpipe.info_list;
 
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.animation.Animation;
+import android.widget.LinearLayout;
 
 import org.schabi.newpipe.R;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.util.OnClickGesture;
+import org.schabi.newpipe.util.ToolbarBelowItemAnimation;
+import org.schabi.newpipe.util.ToolbarOverlayItemAnimation;
 
-public class InfoItemToolbarHelper {
+public class InfoItemHolderUtils {
+    private static final int toggleItemToolbarAnimationDuration = 100; // ms
+
     private static <T> void setListenerOrHide(View button, @Nullable OnClickGesture<T> onClickGesture, T item) {
         if (onClickGesture == null) {
             button.setVisibility(View.GONE);
@@ -40,5 +47,65 @@ public class InfoItemToolbarHelper {
         setListenerOrHide(playBackgroundButton,         listener.getPlayBackgroundListener(),         item);
         setListenerOrHide(playPopupButton,              listener.getPlayPopupListener(),              item);
         setListenerOrHide(playMainButton,               listener.getPlayMainListener(),               item);
+    }
+
+    public static <T> void setClickListener(InfoItemSelectedListener<T> listener, T item, View... views) {
+        for(View view : views) {
+            view.setOnClickListener(v -> {
+                final OnClickGesture<T> itemSelectedListener = listener.getItemSelectedListener();
+                if (itemSelectedListener != null) {
+                    itemSelectedListener.selected(item);
+                }
+            });
+        }
+    }
+
+    public static <T> void setLongClickListener(InfoItemSelectedListener<T> listener, T item, View... views) {
+        for(View view : views) {
+            view.setLongClickable(true);
+            view.setOnLongClickListener(v -> {
+                final OnClickGesture<T> itemSelectedListener = listener.getItemSelectedListener();
+                if (itemSelectedListener != null) {
+                    itemSelectedListener.held(item);
+                }
+                return true;
+            });
+        }
+    }
+
+    public static LinearLayout getToolbarViewFromItem(View itemView) {
+        LinearLayout itemToolbarView = itemView.findViewById(R.id.toolbarBelowItem);
+        if (itemToolbarView == null) {
+            itemToolbarView = itemView.findViewById(R.id.toolbarOverlayItem);
+        }
+        return itemToolbarView;
+    }
+
+    public static void resetItemToolbarView(LinearLayout itemToolbarView, View... viewsUnderground) {
+        switch (itemToolbarView.getId()) {
+            case R.id.toolbarOverlayItem:
+                ToolbarOverlayItemAnimation.resetToolbarOverlayItem(itemToolbarView, viewsUnderground);
+                break;
+            case R.id.toolbarBelowItem:
+                ToolbarBelowItemAnimation.resetToolbarBelowItem(itemToolbarView);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid itemToolbarView passed to resetItemToolbarView()");
+        }
+    }
+
+    public static void toggleItemToolbar(LinearLayout itemToolbarView, View... viewsUnderground) {
+        Animation animation;
+        switch (itemToolbarView.getId()) {
+            case R.id.toolbarOverlayItem:
+                animation = new ToolbarOverlayItemAnimation(toggleItemToolbarAnimationDuration, itemToolbarView, viewsUnderground);
+                break;
+            case R.id.toolbarBelowItem:
+                animation = new ToolbarBelowItemAnimation(toggleItemToolbarAnimationDuration, itemToolbarView);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid itemToolbarView passed to toggleItemToolbar()");
+        }
+        itemToolbarView.startAnimation(animation);
     }
 }
