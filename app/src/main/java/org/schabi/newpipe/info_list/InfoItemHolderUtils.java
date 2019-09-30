@@ -1,12 +1,12 @@
 package org.schabi.newpipe.info_list;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.LinearLayout;
 
 import org.schabi.newpipe.R;
-import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.util.OnClickGesture;
 import org.schabi.newpipe.util.ToolbarBelowItemAnimation;
 import org.schabi.newpipe.util.ToolbarOverlayItemAnimation;
@@ -73,10 +73,14 @@ public class InfoItemHolderUtils {
         }
     }
 
+    @NonNull
     public static LinearLayout getToolbarViewFromItem(View itemView) {
         LinearLayout itemToolbarView = itemView.findViewById(R.id.toolbarBelowItem);
         if (itemToolbarView == null) {
             itemToolbarView = itemView.findViewById(R.id.toolbarOverlayItem);
+            if (itemToolbarView == null) {
+                throw new IllegalArgumentException("Invalid itemView passed to getToolbarViewFromItem(): no item toolbars found");
+            }
         }
         return itemToolbarView;
     }

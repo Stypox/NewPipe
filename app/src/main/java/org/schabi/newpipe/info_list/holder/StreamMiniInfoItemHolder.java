@@ -1,9 +1,9 @@
 package org.schabi.newpipe.info_list.holder;
 
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,9 +19,6 @@ import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.util.AnimationUtils;
 import org.schabi.newpipe.util.ImageDisplayConstants;
 import org.schabi.newpipe.util.Localization;
-import org.schabi.newpipe.util.OnClickGesture;
-import org.schabi.newpipe.util.ToolbarBelowItemAnimation;
-import org.schabi.newpipe.util.ToolbarOverlayItemAnimation;
 import org.schabi.newpipe.views.AnimatedProgressBar;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +29,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
     public final TextView itemUploaderView;
     public final TextView itemDurationView;
     public final AnimatedProgressBar itemProgressView;
-    public final LinearLayout itemToolbarView;
+    @NonNull public final LinearLayout itemToolbarView;
 
     StreamMiniInfoItemHolder(InfoItemBuilder infoItemBuilder, int layoutId, ViewGroup parent) {
         super(infoItemBuilder, layoutId, parent);
