@@ -11,6 +11,7 @@
     android:visibility="gone">
 
     <ImageButton
+        android:id="@+id/shareToolbarButton"
         android:layout_width="@dimen/toolbarBelowItemHeight"
         android:layout_height="@dimen/toolbarBelowItemHeight"
         android:src="?attr/share"
@@ -19,6 +20,7 @@
         android:focusable="true" />
 
     <ImageButton
+        android:id="@+id/addToPlaylistToolbarButton"
         android:layout_width="@dimen/toolbarBelowItemHeight"
         android:layout_height="@dimen/toolbarBelowItemHeight"
         android:src="?attr/ic_playlist_add"
@@ -27,6 +29,7 @@
         android:focusable="true" />
 
     <ImageButton
+        android:id="@+id/deleteToolbarButton"
         android:layout_width="@dimen/toolbarBelowItemHeight"
         android:layout_height="@dimen/toolbarBelowItemHeight"
         android:src="?attr/ic_delete"
@@ -35,6 +38,7 @@
         android:focusable="true" />
 
     <ImageButton
+        android:id="@+id/setAsPlaylistThumbnailToolbarButton"
         android:layout_width="@dimen/toolbarBelowItemHeight"
         android:layout_height="@dimen/toolbarBelowItemHeight"
         android:src="?attr/ic_set_playlist_thumbnail"
@@ -50,6 +54,7 @@
         android:orientation="horizontal" />
 
     <ImageButton
+        android:id="@+id/downloadToolbarButton"
         android:layout_width="@dimen/toolbarBelowItemHeight"
         android:layout_height="@dimen/toolbarBelowItemHeight"
         android:src="?attr/download"
@@ -58,6 +63,7 @@
         android:focusable="true" />
 
     <ImageButton
+        android:id="@+id/playBackgroundToolbarButton"
         android:layout_width="@dimen/toolbarBelowItemHeight"
         android:layout_height="@dimen/toolbarBelowItemHeight"
         android:src="?attr/audio"
@@ -66,6 +72,7 @@
         android:focusable="true" />
 
     <ImageButton
+        android:id="@+id/playPopupToolbarButton"
         android:layout_width="@dimen/toolbarBelowItemHeight"
         android:layout_height="@dimen/toolbarBelowItemHeight"
         android:src="?attr/popup"
@@ -74,6 +81,7 @@
         android:focusable="true" />
 
     <ImageButton
+        android:id="@+id/playMainToolbarButton"
         android:layout_width="@dimen/toolbarBelowItemHeight"
         android:layout_height="@dimen/toolbarBelowItemHeight"
         android:src="?attr/play"
