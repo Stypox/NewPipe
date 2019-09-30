@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.LinearLayout;
 
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.extractor.InfoItem;
@@ -26,9 +25,9 @@ import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.fragments.BaseStateFragment;
 import org.schabi.newpipe.fragments.OnScrollBelowItemsListener;
 import org.schabi.newpipe.info_list.InfoItemDialog;
+import org.schabi.newpipe.info_list.InfoItemSelectedListener;
 import org.schabi.newpipe.info_list.InfoListAdapter;
 import org.schabi.newpipe.report.ErrorActivity;
-import org.schabi.newpipe.util.ToolbarBelowItemAnimation;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.OnClickGesture;
 import org.schabi.newpipe.util.StateSaver;
@@ -181,7 +180,9 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I> implem
     @Override
     protected void initListeners() {
         super.initListeners();
-        infoListAdapter.setOnStreamSelectedListener(new OnClickGesture<StreamInfoItem>() {
+
+        InfoItemSelectedListener<StreamInfoItem> streamToolbarListener = InfoItemSelectedListener.buildDefaultStreamListener(getActivity());
+        streamToolbarListener.setItemSelectedListener(new OnClickGesture<StreamInfoItem>() {
             @Override
             public void selected(StreamInfoItem selectedItem) {
                 onStreamSelected(selectedItem);
@@ -192,6 +193,7 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I> implem
                 showStreamDialog(selectedItem);
             }
         });
+        infoListAdapter.setStreamToolbarListener(streamToolbarListener);
 
         infoListAdapter.setOnChannelSelectedListener((selectedItem) -> {
             try {
@@ -217,7 +219,7 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I> implem
             }
         });
 
-        infoListAdapter.setOnCommentsSelectedListener((selectedItem) -> onItemSelected(selectedItem));
+        infoListAdapter.setOnCommentsSelectedListener(this::onItemSelected);
 
         itemsList.clearOnScrollListeners();
         itemsList.addOnScrollListener(new OnScrollBelowItemsListener() {

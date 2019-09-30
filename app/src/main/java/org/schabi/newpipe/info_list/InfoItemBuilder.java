@@ -50,13 +50,14 @@ public class InfoItemBuilder {
     private final Context context;
     private final ImageLoader imageLoader = ImageLoader.getInstance();
 
-    private OnClickGesture<StreamInfoItem> onStreamSelectedListener;
+    @NonNull private InfoItemSelectedListener<StreamInfoItem> streamToolbarListener;
     private OnClickGesture<ChannelInfoItem> onChannelSelectedListener;
     private OnClickGesture<PlaylistInfoItem> onPlaylistSelectedListener;
     private OnClickGesture<CommentsInfoItem> onCommentsSelectedListener;
 
     public InfoItemBuilder(Context context) {
         this.context = context;
+        this.streamToolbarListener = new InfoItemSelectedListener<>();
     }
 
     public View buildView(@NonNull ViewGroup parent, @NonNull final InfoItem infoItem, final HistoryRecordManager historyRecordManager) {
@@ -93,12 +94,13 @@ public class InfoItemBuilder {
         return imageLoader;
     }
 
-    public OnClickGesture<StreamInfoItem> getOnStreamSelectedListener() {
-        return onStreamSelectedListener;
+    @NonNull
+    public InfoItemSelectedListener<StreamInfoItem> getStreamToolbarListener() {
+        return streamToolbarListener;
     }
 
-    public void setOnStreamSelectedListener(OnClickGesture<StreamInfoItem> listener) {
-        this.onStreamSelectedListener = listener;
+    public void setStreamToolbarListener(@NonNull InfoItemSelectedListener<StreamInfoItem> listener) {
+        streamToolbarListener = listener;
     }
 
     public OnClickGesture<ChannelInfoItem> getOnChannelSelectedListener() {

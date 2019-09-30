@@ -14,10 +14,12 @@ import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.info_list.InfoItemBuilder;
+import org.schabi.newpipe.info_list.InfoItemToolbarHelper;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.util.AnimationUtils;
 import org.schabi.newpipe.util.ImageDisplayConstants;
 import org.schabi.newpipe.util.Localization;
+import org.schabi.newpipe.util.OnClickGesture;
 import org.schabi.newpipe.util.ToolbarBelowItemAnimation;
 import org.schabi.newpipe.util.ToolbarOverlayItemAnimation;
 import org.schabi.newpipe.views.AnimatedProgressBar;
@@ -105,17 +107,15 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
                         itemThumbnailView,
                         ImageDisplayConstants.DISPLAY_THUMBNAIL_OPTIONS);
 
-        itemView.setOnClickListener(view -> {
-            if (itemBuilder.getOnStreamSelectedListener() != null) {
-                toggleItemToolbar();
+        itemView.setOnClickListener(v -> toggleItemToolbar());
+        itemThumbnailView.setOnClickListener(v -> {
+            final OnClickGesture<StreamInfoItem> itemSelectedListener = itemBuilder.getStreamToolbarListener().getItemSelectedListener();
+            if (itemSelectedListener != null) {
+                itemSelectedListener.selected(item);
             }
         });
 
-        itemThumbnailView.setOnClickListener(v -> {
-            if (itemBuilder.getOnStreamSelectedListener() != null) {
-                itemBuilder.getOnStreamSelectedListener().selected(item);
-            }
-        });
+        InfoItemToolbarHelper.setListenersOrHideToolbarButtons(itemView, itemBuilder.getStreamToolbarListener(), item);
 
         switch (item.getStreamType()) {
             case AUDIO_STREAM:
@@ -151,18 +151,27 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
     }
 
     private void enableLongClick(final StreamInfoItem item) {
-        itemView.setLongClickable(true);
-        itemView.setOnLongClickListener(view -> {
-            if (itemBuilder.getOnStreamSelectedListener() != null) {
-                itemBuilder.getOnStreamSelectedListener().held(item);
+        View.OnLongClickListener onLongClickListener = v -> {
+            final OnClickGesture<StreamInfoItem> itemSelectedListener = itemBuilder.getStreamToolbarListener().getItemSelectedListener();
+            if (itemSelectedListener != null) {
+                itemSelectedListener.held(item);
             }
             return true;
-        });
+        };
+
+        itemView.setLongClickable(true);
+        itemView.setOnLongClickListener(onLongClickListener);
+
+        itemThumbnailView.setLongClickable(true);
+        itemThumbnailView.setOnLongClickListener(onLongClickListener);
     }
 
     private void disableLongClick() {
         itemView.setLongClickable(false);
         itemView.setOnLongClickListener(null);
+
+        itemThumbnailView.setLongClickable(false);
+        itemThumbnailView.setOnLongClickListener(null);
     }
 
     private void toggleItemToolbar() {

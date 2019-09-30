@@ -98,8 +98,8 @@ public class InfoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         infoItemList = new ArrayList<>();
     }
 
-    public void setOnStreamSelectedListener(OnClickGesture<StreamInfoItem> listener) {
-        infoItemBuilder.setOnStreamSelectedListener(listener);
+    public void setStreamToolbarListener(@NonNull InfoItemSelectedListener<StreamInfoItem> listener) {
+        infoItemBuilder.setStreamToolbarListener(listener);
     }
 
     public void setOnChannelSelectedListener(OnClickGesture<ChannelInfoItem> listener) {
