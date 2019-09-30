@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -32,6 +33,7 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.Stream;
 import org.schabi.newpipe.extractor.stream.StreamInfo;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.VideoStream;
 import org.schabi.newpipe.fragments.MainFragment;
 import org.schabi.newpipe.fragments.detail.VideoDetailFragment;
@@ -60,6 +62,10 @@ import org.schabi.newpipe.settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class NavigationHelper {
@@ -243,7 +249,21 @@ public class NavigationHelper {
     // Download
     ////////////////////////////////////////////////////////////////////////////
 
-    public static void openDownloadDialog(Fragment fragment, StreamInfo info, List<VideoStream> sortedVideoStreams, int selectedVideoStreamIndex) {
+    private static void showDownloadDialogError(FragmentActivity activity, int serviceId, Throwable e) {
+        ErrorActivity.ErrorInfo errorInfo = ErrorActivity.ErrorInfo.make(UserAction.UI_ERROR,
+                ServiceList.all()
+                        .get(serviceId)
+                        .getServiceInfo()
+                        .getName(), "",
+                R.string.could_not_setup_download_menu);
+
+        ErrorActivity.reportError(activity,
+                e,
+                activity.getClass(),
+                activity.findViewById(android.R.id.content), errorInfo);
+    }
+
+    public static void openDownloadDialog(FragmentActivity activity, StreamInfo info, List<VideoStream> sortedVideoStreams, int selectedVideoStreamIndex) {
         try {
             DownloadDialog downloadDialog = DownloadDialog.newInstance(info);
             downloadDialog.setVideoStreams(sortedVideoStreams);
@@ -251,20 +271,37 @@ public class NavigationHelper {
             downloadDialog.setSelectedVideoStream(selectedVideoStreamIndex);
             downloadDialog.setSubtitleStreams(info.getSubtitles());
 
-            downloadDialog.show(fragment.requireFragmentManager(), "downloadDialog");
+            downloadDialog.show(activity.getSupportFragmentManager(), "downloadDialog");
         } catch (Exception e) {
-            ErrorActivity.ErrorInfo errorInfo = ErrorActivity.ErrorInfo.make(UserAction.UI_ERROR,
-                    ServiceList.all()
-                            .get(info.getServiceId())
-                            .getServiceInfo()
-                            .getName(), "",
-                    R.string.could_not_setup_download_menu);
-
-            ErrorActivity.reportError(fragment.requireActivity(),
-                    e,
-                    fragment.getClass(),
-                    fragment.requireActivity().findViewById(android.R.id.content), errorInfo);
+            showDownloadDialogError(activity, info.getServiceId(), e);
         }
+    }
+
+    public static void openDownloadDialog(FragmentActivity activity, StreamInfo info) {
+        try {
+            List<VideoStream> sortedVideoStreams = ListHelper.getSortedStreamVideosList(
+                    activity,
+                    info.getVideoStreams(),
+                    info.getVideoOnlyStreams(),
+                    false);
+
+            int selectedVideoStreamIndex = ListHelper.getDefaultResolutionIndex(
+                    activity,
+                    sortedVideoStreams);
+
+            openDownloadDialog(activity, info, sortedVideoStreams, selectedVideoStreamIndex);
+        } catch (Exception e) {
+            showDownloadDialogError(activity, info.getServiceId(), e);
+        }
+    }
+
+    @NonNull
+    public static Disposable openDownloadDialog(FragmentActivity activity, @NonNull StreamInfoItem infoItem) {
+        return ExtractorHelper.getStreamInfo(infoItem.getServiceId(), infoItem.getUrl(), true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> NavigationHelper.openDownloadDialog(activity, result),
+                        e -> showDownloadDialogError(activity, infoItem.getServiceId(), e));
     }
 
     /*//////////////////////////////////////////////////////////////////////////
