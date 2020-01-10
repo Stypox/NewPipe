@@ -59,32 +59,6 @@ public class InfoItemBuilder {
         this.context = context;
     }
 
-    public View buildView(@NonNull ViewGroup parent, @NonNull final InfoItem infoItem, final HistoryRecordManager historyRecordManager) {
-        return buildView(parent, infoItem, historyRecordManager, false);
-    }
-
-    public View buildView(@NonNull ViewGroup parent, @NonNull final InfoItem infoItem,
-                          final HistoryRecordManager historyRecordManager, boolean useMiniVariant) {
-        InfoItemHolder holder = holderFromInfoType(parent, infoItem.getInfoType(), useMiniVariant);
-        holder.updateFromItem(infoItem, historyRecordManager);
-        return holder.itemView;
-    }
-
-    private InfoItemHolder holderFromInfoType(@NonNull ViewGroup parent, @NonNull InfoItem.InfoType infoType, boolean useMiniVariant) {
-        switch (infoType) {
-            case STREAM:
-                return useMiniVariant ? new StreamMiniInfoItemHolder(this, parent) : new StreamInfoItemHolder(this, parent);
-            case CHANNEL:
-                return useMiniVariant ? new ChannelMiniInfoItemHolder(this, parent) : new ChannelInfoItemHolder(this, parent);
-            case PLAYLIST:
-                return useMiniVariant ? new PlaylistMiniInfoItemHolder(this, parent) : new PlaylistInfoItemHolder(this, parent);
-            case COMMENT:
-                return useMiniVariant ? new CommentsMiniInfoItemHolder(this, parent) : new CommentsInfoItemHolder(this, parent);
-            default:
-                throw new RuntimeException("InfoType not expected = " + infoType.name());
-        }
-    }
-
     public Context getContext() {
         return context;
     }

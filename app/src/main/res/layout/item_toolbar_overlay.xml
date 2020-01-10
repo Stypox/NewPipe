@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbarOverlayItem"
+    android:layout_height="0dp"
+    android:layout_width="0dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:visibility="invisible">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/shareToolbarButton"
+            android:layout_width="@dimen/item_toolbar_below_height"
+            android:layout_height="@dimen/item_toolbar_below_height"
+            android:src="?attr/share"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <ImageButton
+            android:id="@+id/addToPlaylistToolbarButton"
+            android:layout_width="@dimen/item_toolbar_below_height"
+            android:layout_height="@dimen/item_toolbar_below_height"
+            android:src="?attr/ic_playlist_add"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <ImageButton
+            android:id="@+id/deleteToolbarButton"
+            android:layout_width="@dimen/item_toolbar_below_height"
+            android:layout_height="@dimen/item_toolbar_below_height"
+            android:src="?attr/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <ImageButton
+            android:id="@+id/setAsPlaylistThumbnailToolbarButton"
+            android:layout_width="@dimen/item_toolbar_below_height"
+            android:layout_height="@dimen/item_toolbar_below_height"
+            android:src="?attr/ic_set_playlist_thumbnail"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/downloadToolbarButton"
+            android:layout_width="@dimen/item_toolbar_below_height"
+            android:layout_height="@dimen/item_toolbar_below_height"
+            android:src="?attr/download"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <ImageButton
+            android:id="@+id/playBackgroundToolbarButton"
+            android:layout_width="@dimen/item_toolbar_below_height"
+            android:layout_height="@dimen/item_toolbar_below_height"
+            android:src="?attr/audio"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <ImageButton
+            android:id="@+id/playPopupToolbarButton"
+            android:layout_width="@dimen/item_toolbar_below_height"
+            android:layout_height="@dimen/item_toolbar_below_height"
+            android:src="?attr/popup"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <ImageButton
+            android:id="@+id/playMainToolbarButton"
+            android:layout_width="@dimen/item_toolbar_below_height"
+            android:layout_height="@dimen/item_toolbar_below_height"
+            android:src="?attr/play"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+</LinearLayout>

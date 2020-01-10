@@ -89,4 +89,9 @@
     <!-- Text Size -->
     <dimen name="comment_item_title_text_size">12sp</dimen>
     <dimen name="comment_item_content_text_size">12sp</dimen>
+
+
+    <!-- Toolbar below item dimensions -->
+    <dimen name="item_toolbar_below_height">39dp</dimen>
+    <dimen name="item_toolbar_below_minus_height">-27dp</dimen>
 </resources>
