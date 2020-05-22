@@ -98,7 +98,7 @@ public class InfoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         infoItemList = new ArrayList<>();
     }
 
-    public void setStreamSelectedListener(@NonNull InfoItemSelectedListener<StreamInfoItem> listener) {
+    public void setStreamSelectedListener(@NonNull ItemSelectedListener<StreamInfoItem> listener) {
         infoItemBuilder.setStreamSelectedListener(listener);
     }
 

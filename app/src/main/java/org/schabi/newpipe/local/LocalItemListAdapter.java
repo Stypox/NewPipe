@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import org.schabi.newpipe.database.LocalItem;
 import org.schabi.newpipe.database.stream.model.StreamStateEntity;
+import org.schabi.newpipe.info_list.ItemSelectedListener;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.local.holder.LocalItemHolder;
 import org.schabi.newpipe.local.holder.LocalPlaylistGridItemHolder;
@@ -85,11 +86,15 @@ public class LocalItemListAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     public void setSelectedListener(OnClickGesture<LocalItem> listener) {
-        localItemBuilder.setOnItemSelectedListener(listener);
+        localItemBuilder.setOnSelectedListener(listener);
+    }
+
+    public void setStreamSelectedListener(ItemSelectedListener<LocalItem> listener) {
+        localItemBuilder.setStreamSelectedListener(listener);
     }
 
     public void unsetSelectedListener() {
-        localItemBuilder.setOnItemSelectedListener(null);
+        localItemBuilder.setOnSelectedListener(null);
     }
 
     public void addItems(@Nullable List<? extends LocalItem> data) {

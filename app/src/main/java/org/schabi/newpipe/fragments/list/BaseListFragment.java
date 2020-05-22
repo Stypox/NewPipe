@@ -25,7 +25,7 @@ import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.fragments.BaseStateFragment;
 import org.schabi.newpipe.fragments.OnScrollBelowItemsListener;
 import org.schabi.newpipe.info_list.InfoItemDialog;
-import org.schabi.newpipe.info_list.InfoItemSelectedListener;
+import org.schabi.newpipe.info_list.ItemSelectedListener;
 import org.schabi.newpipe.info_list.InfoListAdapter;
 import org.schabi.newpipe.report.ErrorActivity;
 import org.schabi.newpipe.util.NavigationHelper;
@@ -181,8 +181,8 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I> implem
     protected void initListeners() {
         super.initListeners();
 
-        InfoItemSelectedListener<StreamInfoItem> streamToolbarListener = InfoItemSelectedListener.buildDefaultStreamListener(getActivity());
-        streamToolbarListener.setItemSelectedListener(new OnClickGesture<StreamInfoItem>() {
+        ItemSelectedListener<StreamInfoItem> streamToolbarListener = ItemSelectedListener.buildDefaultStreamListener(getActivity());
+        streamToolbarListener.setItemClickedListener(new OnClickGesture<StreamInfoItem>() {
             @Override
             public void selected(StreamInfoItem selectedItem) {
                 onStreamSelected(selectedItem);

@@ -113,15 +113,15 @@ public class LocalStatisticStreamItemHolder extends LocalItemHolder {
                 ImageDisplayConstants.DISPLAY_THUMBNAIL_OPTIONS);
 
         itemView.setOnClickListener(view -> {
-            if (itemBuilder.getOnItemSelectedListener() != null) {
-                itemBuilder.getOnItemSelectedListener().selected(item);
+            if (itemBuilder.getOnSelectedListener() != null) {
+                itemBuilder.getOnSelectedListener().selected(item);
             }
         });
 
         itemView.setLongClickable(true);
         itemView.setOnLongClickListener(view -> {
-            if (itemBuilder.getOnItemSelectedListener() != null) {
-                itemBuilder.getOnItemSelectedListener().held(item);
+            if (itemBuilder.getOnSelectedListener() != null) {
+                itemBuilder.getOnSelectedListener().held(item);
             }
             return true;
         });

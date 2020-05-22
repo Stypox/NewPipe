@@ -21,6 +21,16 @@
 		android:src="@drawable/dummy_thumbnail"
 		tools:ignore="RtlHardcoded" />
 
+	<include
+		layout="@layout/toolbar_overlay_item"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		android:layout_centerHorizontal="true"
+		android:layout_alignStart="@id/itemThumbnailView"
+		android:layout_alignEnd="@id/itemThumbnailView"
+		android:layout_alignTop="@id/itemThumbnailView"
+		android:layout_alignBottom="@id/itemThumbnailView" />
+
 	<TextView
 		android:id="@+id/itemDurationView"
 		android:layout_width="wrap_content"

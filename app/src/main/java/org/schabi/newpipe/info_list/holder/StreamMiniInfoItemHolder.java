@@ -14,7 +14,8 @@ import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.info_list.InfoItemBuilder;
-import org.schabi.newpipe.info_list.InfoItemHolderUtils;
+import org.schabi.newpipe.info_list.ItemHolderUtils;
+import org.schabi.newpipe.info_list.ItemSelectedListener;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.util.AnimationUtils;
 import org.schabi.newpipe.util.ImageDisplayConstants;
@@ -39,7 +40,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         itemUploaderView = itemView.findViewById(R.id.itemUploaderView);
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
         itemProgressView = itemView.findViewById(R.id.itemProgressView);
-        itemToolbarView = InfoItemHolderUtils.getToolbarViewFromItem(itemView);
+        itemToolbarView = ItemHolderUtils.getToolbarViewFromItem(itemView);
     }
 
     public StreamMiniInfoItemHolder(InfoItemBuilder infoItemBuilder, ViewGroup parent) {
@@ -85,18 +86,20 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
                         itemThumbnailView,
                         ImageDisplayConstants.DISPLAY_THUMBNAIL_OPTIONS);
 
-        InfoItemHolderUtils.resetItemToolbarView(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView);
+        ItemHolderUtils.resetItemToolbarView(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView);
+        itemView.setOnClickListener(v -> ItemHolderUtils.toggleItemToolbar(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView));
 
-        itemView.setOnClickListener(v -> InfoItemHolderUtils.toggleItemToolbar(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView));
-        InfoItemHolderUtils.setClickListener(itemBuilder.getStreamSelectedListener(), item, itemThumbnailView);
-        InfoItemHolderUtils.setListenersOrHideToolbarButtons(itemView, itemBuilder.getStreamSelectedListener(), item);
+        ItemSelectedListener<StreamInfoItem> listener = itemBuilder.getStreamSelectedListener();
+
+        ItemHolderUtils.setListenersOrHideToolbarButtons(listener, item, itemView);
+        ItemHolderUtils.setClickListener(listener, item, itemThumbnailView);
 
         switch (item.getStreamType()) {
             case AUDIO_STREAM:
             case VIDEO_STREAM:
             case LIVE_STREAM:
             case AUDIO_LIVE_STREAM:
-                InfoItemHolderUtils.setLongClickListener(itemBuilder.getStreamSelectedListener(), item, itemView, itemThumbnailView);
+                ItemHolderUtils.setLongClickListener(listener, item, itemView, itemThumbnailView);
                 break;
             case FILE:
             case NONE:

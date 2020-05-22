@@ -14,8 +14,8 @@ import java.util.Collections;
 
 import io.reactivex.disposables.Disposable;
 
-public class InfoItemSelectedListener<T> {
-    @Nullable private OnClickGesture<T> itemSelectedListener;
+public class ItemSelectedListener<T> {
+    @Nullable private OnClickGesture<T> itemClickedListener;
 
     @Nullable private OnClickGesture<T> playBackgroundListener;
     @Nullable private OnClickGesture<T> playPopupListener;
@@ -27,8 +27,8 @@ public class InfoItemSelectedListener<T> {
     @Nullable private OnClickGesture<T> setAsPlaylistThumbnailListener;
 
 
-    public static InfoItemSelectedListener<StreamInfoItem> buildDefaultStreamListener(FragmentActivity activity) {
-        InfoItemSelectedListener<StreamInfoItem> result = new InfoItemSelectedListener<>();
+    public static ItemSelectedListener<StreamInfoItem> buildDefaultStreamListener(FragmentActivity activity) {
+        ItemSelectedListener<StreamInfoItem> result = new ItemSelectedListener<>();
 
         result.setDownloadListener(new OnClickGesture<StreamInfoItem>() {
             Disposable disposable;
@@ -82,7 +82,7 @@ public class InfoItemSelectedListener<T> {
         result.setAddToPlaylistListener(selectedItem -> {
             if (activity.getSupportFragmentManager() != null) {
                 PlaylistAppendDialog.fromStreamInfoItems(Collections.singletonList(selectedItem))
-                        .show(activity.getSupportFragmentManager(), InfoItemSelectedListener.class.getSimpleName());
+                        .show(activity.getSupportFragmentManager(), ItemSelectedListener.class.getSimpleName());
             }
         });
 
@@ -91,8 +91,8 @@ public class InfoItemSelectedListener<T> {
 
 
     @Nullable
-    public OnClickGesture<T> getItemSelectedListener() {
-        return itemSelectedListener;
+    public OnClickGesture<T> getItemClickedListener() {
+        return itemClickedListener;
     }
 
     @Nullable
@@ -136,8 +136,8 @@ public class InfoItemSelectedListener<T> {
     }
 
 
-    public void setItemSelectedListener(@Nullable OnClickGesture<T> itemSelectedListener) {
-        this.itemSelectedListener = itemSelectedListener;
+    public void setItemClickedListener(@Nullable OnClickGesture<T> itemClickedListener) {
+        this.itemClickedListener = itemClickedListener;
     }
 
     public void setPlayBackgroundListener(@Nullable OnClickGesture<T> playBackgroundListener) {

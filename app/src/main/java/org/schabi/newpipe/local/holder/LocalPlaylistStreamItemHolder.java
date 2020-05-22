@@ -1,10 +1,12 @@
 package org.schabi.newpipe.local.holder;
 
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.schabi.newpipe.R;
@@ -12,11 +14,15 @@ import org.schabi.newpipe.database.LocalItem;
 import org.schabi.newpipe.database.playlist.PlaylistStreamEntry;
 import org.schabi.newpipe.database.stream.model.StreamStateEntity;
 import org.schabi.newpipe.extractor.NewPipe;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
+import org.schabi.newpipe.info_list.ItemHolderUtils;
+import org.schabi.newpipe.info_list.ItemSelectedListener;
 import org.schabi.newpipe.local.LocalItemBuilder;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
 import org.schabi.newpipe.util.AnimationUtils;
 import org.schabi.newpipe.util.ImageDisplayConstants;
 import org.schabi.newpipe.util.Localization;
+import org.schabi.newpipe.util.OnClickGesture;
 import org.schabi.newpipe.views.AnimatedProgressBar;
 
 import java.text.DateFormat;
@@ -31,6 +37,7 @@ public class LocalPlaylistStreamItemHolder extends LocalItemHolder {
     public final TextView itemDurationView;
     public final View itemHandleView;
     public final AnimatedProgressBar itemProgressView;
+    @NonNull public final LinearLayout itemToolbarView;
 
     LocalPlaylistStreamItemHolder(LocalItemBuilder infoItemBuilder, int layoutId, ViewGroup parent) {
         super(infoItemBuilder, layoutId, parent);
@@ -41,6 +48,7 @@ public class LocalPlaylistStreamItemHolder extends LocalItemHolder {
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
         itemHandleView = itemView.findViewById(R.id.itemHandle);
         itemProgressView = itemView.findViewById(R.id.itemProgressView);
+        itemToolbarView = ItemHolderUtils.getToolbarViewFromItem(itemView);
     }
 
     public LocalPlaylistStreamItemHolder(LocalItemBuilder infoItemBuilder, ViewGroup parent) {
@@ -78,21 +86,20 @@ public class LocalPlaylistStreamItemHolder extends LocalItemHolder {
         itemBuilder.displayImage(item.thumbnailUrl, itemThumbnailView,
                 ImageDisplayConstants.DISPLAY_THUMBNAIL_OPTIONS);
 
-        itemView.setOnClickListener(view -> {
-            if (itemBuilder.getOnItemSelectedListener() != null) {
-                itemBuilder.getOnItemSelectedListener().selected(item);
-            }
-        });
+        ItemHolderUtils.resetItemToolbarView(itemToolbarView, itemThumbnailView, itemDurationView, itemProgressView);
+        itemView.setOnClickListener(v -> toggleItemToolbar());
 
-        itemView.setLongClickable(true);
-        itemView.setOnLongClickListener(view -> {
-            if (itemBuilder.getOnItemSelectedListener() != null) {
-                itemBuilder.getOnItemSelectedListener().held(item);
-            }
-            return true;
-        });
+        ItemSelectedListener<LocalItem> listener = itemBuilder.getStreamSelectedListener();
 
-        itemHandleView.setOnTouchListener(getOnTouchListener(item));
+        ItemHolderUtils.setListenersOrHideToolbarButtons(listener, item, itemView);
+        ItemHolderUtils.setClickListener(listener, item, itemThumbnailView);
+        ItemHolderUtils.setLongClickListener(listener, item, itemView, itemThumbnailView);
+
+        ItemHolderUtils.setDragListener(listener, item, this, () -> {
+            if (itemToolbarView.getVisibility() == View.VISIBLE) {
+                toggleItemToolbar();
+            }
+        }, itemHandleView);
     }
 
     @Override
@@ -114,15 +121,8 @@ public class LocalPlaylistStreamItemHolder extends LocalItemHolder {
         }
     }
 
-    private View.OnTouchListener getOnTouchListener(final PlaylistStreamEntry item) {
-        return (view, motionEvent) -> {
-            view.performClick();
-            if (itemBuilder != null && itemBuilder.getOnItemSelectedListener() != null &&
-                    motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                itemBuilder.getOnItemSelectedListener().drag(item,
-                        LocalPlaylistStreamItemHolder.this);
-            }
-            return false;
-        };
+    private void toggleItemToolbar() {
+        ItemHolderUtils.toggleItemToolbar(itemToolbarView,
+                itemThumbnailView, itemDurationView, itemProgressView);
     }
 }

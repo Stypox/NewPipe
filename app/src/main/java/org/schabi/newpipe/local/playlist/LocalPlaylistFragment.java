@@ -27,13 +27,16 @@ import org.schabi.newpipe.database.playlist.PlaylistStreamEntry;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.info_list.InfoItemDialog;
+import org.schabi.newpipe.info_list.ItemSelectedListener;
 import org.schabi.newpipe.local.BaseLocalListFragment;
+import org.schabi.newpipe.local.dialog.PlaylistAppendDialog;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
 import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
 import org.schabi.newpipe.report.UserAction;
 import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.OnClickGesture;
+import org.schabi.newpipe.util.ShareUtils;
 import org.schabi.newpipe.util.StreamDialogEntry;
 
 import java.util.ArrayList;
@@ -161,7 +164,84 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
         itemTouchHelper = new ItemTouchHelper(getItemTouchCallback());
         itemTouchHelper.attachToRecyclerView(itemsList);
 
-        itemListAdapter.setSelectedListener(new OnClickGesture<LocalItem>() {
+
+        ItemSelectedListener<LocalItem> itemListener = new ItemSelectedListener<>();
+
+        itemListener.setDownloadListener(new OnClickGesture<LocalItem>() {
+            Disposable disposable;
+
+            @Override
+            public void selected(LocalItem selectedItem) {
+                if (disposable != null) {
+                    disposable.dispose();
+                }
+
+                if (selectedItem instanceof PlaylistStreamEntry) {
+                    disposable = NavigationHelper.openDownloadDialog(activity,
+                            ((PlaylistStreamEntry) selectedItem).toStreamInfoItem(), null);
+                }
+            }
+        });
+
+        itemListener.setPlayBackgroundListener(new OnClickGesture<LocalItem>() {
+            @Override
+            public void selected(LocalItem selectedItem) {
+                if (selectedItem instanceof PlaylistStreamEntry) {
+                    NavigationHelper.playOnBackgroundPlayer(activity,
+                            new SinglePlayQueue(((PlaylistStreamEntry) selectedItem).toStreamInfoItem()), true);
+                }
+            }
+
+            @Override
+            public void held(LocalItem selectedItem) {
+                if (selectedItem instanceof PlaylistStreamEntry) {
+                    NavigationHelper.enqueueOnBackgroundPlayer(activity,
+                            new SinglePlayQueue(((PlaylistStreamEntry) selectedItem).toStreamInfoItem()), false);
+                }
+            }
+        });
+
+        itemListener.setPlayPopupListener(new OnClickGesture<LocalItem>() {
+            @Override
+            public void selected(LocalItem selectedItem) {
+                if (selectedItem instanceof PlaylistStreamEntry) {
+                    NavigationHelper.playOnPopupPlayer(activity,
+                            new SinglePlayQueue(((PlaylistStreamEntry) selectedItem).toStreamInfoItem()), true);
+                }
+            }
+
+            @Override
+            public void held(LocalItem selectedItem) {
+                if (selectedItem instanceof PlaylistStreamEntry) {
+                    NavigationHelper.enqueueOnPopupPlayer(activity,
+                            new SinglePlayQueue(((PlaylistStreamEntry) selectedItem).toStreamInfoItem()), false);
+                }
+            }
+        });
+
+        itemListener.setPlayMainListener(selectedItem -> {
+            if (selectedItem instanceof PlaylistStreamEntry) {
+                NavigationHelper.playOnMainPlayer(activity,
+                        new SinglePlayQueue(((PlaylistStreamEntry) selectedItem).toStreamInfoItem()), true);
+            }
+        });
+
+        itemListener.setShareListener(selectedItem -> {
+            if (selectedItem instanceof PlaylistStreamEntry) {
+                ShareUtils.shareUrl(activity,
+                        ((PlaylistStreamEntry) selectedItem).title, ((PlaylistStreamEntry) selectedItem).url);
+            }
+        });
+
+        itemListener.setAddToPlaylistListener(selectedItem -> {
+            if (selectedItem instanceof PlaylistStreamEntry && activity.getSupportFragmentManager() != null) {
+                PlaylistAppendDialog.fromStreamInfoItems(
+                        Collections.singletonList(((PlaylistStreamEntry) selectedItem).toStreamInfoItem()))
+                        .show(activity.getSupportFragmentManager(), ItemSelectedListener.class.getSimpleName());
+            }
+        });
+
+        itemListener.setItemClickedListener(new OnClickGesture<LocalItem>() {
             @Override
             public void selected(LocalItem selectedItem) {
                 if (selectedItem instanceof PlaylistStreamEntry) {
@@ -180,9 +260,25 @@ public class LocalPlaylistFragment extends BaseLocalListFragment<List<PlaylistSt
 
             @Override
             public void drag(LocalItem selectedItem, RecyclerView.ViewHolder viewHolder) {
-                if (itemTouchHelper != null) itemTouchHelper.startDrag(viewHolder);
+                if (itemTouchHelper != null) {
+                    itemTouchHelper.startDrag(viewHolder);
+                }
             }
         });
+
+        itemListener.setSetAsPlaylistThumbnailListener(selectedItem -> {
+            if (selectedItem instanceof PlaylistStreamEntry) {
+                changeThumbnailUrl(((PlaylistStreamEntry) selectedItem).thumbnailUrl);
+            }
+        });
+
+        itemListener.setDeleteListener(selectedItem -> {
+            if (selectedItem instanceof PlaylistStreamEntry) {
+                deleteItem((PlaylistStreamEntry) selectedItem);
+            }
+        });
+
+        itemListAdapter.setStreamSelectedListener(itemListener);
     }
 
     ///////////////////////////////////////////////////////////////////////////

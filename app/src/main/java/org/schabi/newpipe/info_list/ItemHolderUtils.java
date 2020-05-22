@@ -2,6 +2,8 @@ package org.schabi.newpipe.info_list;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.LinearLayout;
@@ -11,7 +13,7 @@ import org.schabi.newpipe.util.OnClickGesture;
 import org.schabi.newpipe.util.ToolbarBelowItemAnimation;
 import org.schabi.newpipe.util.ToolbarOverlayItemAnimation;
 
-public class InfoItemHolderUtils {
+public class ItemHolderUtils {
     private static final int toggleItemToolbarAnimationDuration = 100; // ms
 
     private static <T> void setListenerOrHide(View button, @Nullable OnClickGesture<T> onClickGesture, T item) {
@@ -29,7 +31,7 @@ public class InfoItemHolderUtils {
         }
     }
 
-    public static <T> void setListenersOrHideToolbarButtons(View itemView, InfoItemSelectedListener<T> listener, T item) {
+    public static <T> void setListenersOrHideToolbarButtons(ItemSelectedListener<T> listener, T item, View itemView) {
         View shareButton                  = itemView.findViewById(R.id.shareToolbarButton);
         View addToPlaylistButton          = itemView.findViewById(R.id.addToPlaylistToolbarButton);
         View deleteButton                 = itemView.findViewById(R.id.deleteToolbarButton);
@@ -49,26 +51,40 @@ public class InfoItemHolderUtils {
         setListenerOrHide(playMainButton,               listener.getPlayMainListener(),               item);
     }
 
-    public static <T> void setClickListener(InfoItemSelectedListener<T> listener, T item, View... views) {
+    public static <T> void setClickListener(ItemSelectedListener<T> listener, T item, View... views) {
         for(View view : views) {
             view.setOnClickListener(v -> {
-                final OnClickGesture<T> itemSelectedListener = listener.getItemSelectedListener();
-                if (itemSelectedListener != null) {
-                    itemSelectedListener.selected(item);
+                final OnClickGesture<T> itemClickedListener = listener.getItemClickedListener();
+                if (itemClickedListener != null) {
+                    itemClickedListener.selected(item);
                 }
             });
         }
     }
 
-    public static <T> void setLongClickListener(InfoItemSelectedListener<T> listener, T item, View... views) {
+    public static <T> void setLongClickListener(ItemSelectedListener<T> listener, T item, View... views) {
         for(View view : views) {
             view.setLongClickable(true);
             view.setOnLongClickListener(v -> {
-                final OnClickGesture<T> itemSelectedListener = listener.getItemSelectedListener();
-                if (itemSelectedListener != null) {
-                    itemSelectedListener.held(item);
+                final OnClickGesture<T> itemClickedListener = listener.getItemClickedListener();
+                if (itemClickedListener != null) {
+                    itemClickedListener.held(item);
                 }
                 return true;
+            });
+        }
+    }
+
+    public static <T> void setDragListener(ItemSelectedListener<T> listener, T item, RecyclerView.ViewHolder viewHolder, Runnable actionOnDragStart, View... views) {
+        for(View view : views) {
+            view.setOnTouchListener((v, motionEvent) -> {
+                view.performClick();
+                OnClickGesture<T> itemClickedListener = listener.getItemClickedListener();
+                if (itemClickedListener != null && motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                    actionOnDragStart.run();
+                    itemClickedListener.drag(item, viewHolder);
+                }
+                return false;
             });
         }
     }

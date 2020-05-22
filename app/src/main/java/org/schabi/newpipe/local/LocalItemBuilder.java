@@ -1,12 +1,15 @@
 package org.schabi.newpipe.local;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.schabi.newpipe.database.LocalItem;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
+import org.schabi.newpipe.info_list.ItemSelectedListener;
 import org.schabi.newpipe.util.OnClickGesture;
 
 /*
@@ -35,10 +38,12 @@ public class LocalItemBuilder {
     private final Context context;
     private final ImageLoader imageLoader = ImageLoader.getInstance();
 
+    @NonNull private ItemSelectedListener<LocalItem> streamSelectedListener;
     private OnClickGesture<LocalItem> onSelectedListener;
 
     public LocalItemBuilder(Context context) {
         this.context = context;
+        this.streamSelectedListener = new ItemSelectedListener<>();
     }
 
     public Context getContext() {
@@ -50,11 +55,20 @@ public class LocalItemBuilder {
         imageLoader.displayImage(url, view, options);
     }
 
-    public OnClickGesture<LocalItem> getOnItemSelectedListener() {
+    public OnClickGesture<LocalItem> getOnSelectedListener() {
         return onSelectedListener;
     }
 
-    public void setOnItemSelectedListener(OnClickGesture<LocalItem> listener) {
+    @NonNull
+    public ItemSelectedListener<LocalItem> getStreamSelectedListener() {
+        return streamSelectedListener;
+    }
+
+    public void setOnSelectedListener(OnClickGesture<LocalItem> listener) {
         this.onSelectedListener = listener;
+    }
+
+    public void setStreamSelectedListener(@NonNull ItemSelectedListener<LocalItem> listener) {
+        this.streamSelectedListener = listener;
     }
 }

@@ -34,15 +34,15 @@ public abstract class PlaylistItemHolder extends LocalItemHolder {
     @Override
     public void updateFromItem(final LocalItem localItem, HistoryRecordManager historyRecordManager, final DateFormat dateFormat) {
         itemView.setOnClickListener(view -> {
-            if (itemBuilder.getOnItemSelectedListener() != null) {
-                itemBuilder.getOnItemSelectedListener().selected(localItem);
+            if (itemBuilder.getOnSelectedListener() != null) {
+                itemBuilder.getOnSelectedListener().selected(localItem);
             }
         });
 
         itemView.setLongClickable(true);
         itemView.setOnLongClickListener(view -> {
-            if (itemBuilder.getOnItemSelectedListener() != null) {
-                itemBuilder.getOnItemSelectedListener().held(localItem);
+            if (itemBuilder.getOnSelectedListener() != null) {
+                itemBuilder.getOnSelectedListener().held(localItem);
             }
             return true;
         });
