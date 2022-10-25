@@ -15,6 +15,7 @@ import com.google.android.exoplayer2.video.VideoSize;
 
 import org.schabi.newpipe.extractor.stream.StreamInfo;
 import org.schabi.newpipe.player.Player;
+import org.schabi.newpipe.player.mediaitem.MediaItemTag;
 
 import java.util.List;
 
@@ -183,10 +184,18 @@ public abstract class PlayerUi {
 
     /**
      * Called when the stream being played changes.
-     * @param info the {@link StreamInfo} metadata object, along with data about the selected and
-     *             available video streams (to be used to build the resolution menus, for example)
+     * @param info the {@link StreamInfo} metadata object
      */
     public void onMetadataChanged(@NonNull final StreamInfo info) {
+    }
+
+    /**
+     * Called when the quality of the stream changes. Will also be called when the stream being
+     * played changes. Will be called more often than {@link #onMetadataChanged(StreamInfo)}.
+     * @param quality the {@link MediaItemTag.Quality} with data about the selected and available
+     *                video streams (to be used to build the resolution menus, for example)
+     */
+    public void onQualityChanged(@NonNull final MediaItemTag.Quality quality) {
     }
 
     /**

@@ -978,8 +978,6 @@ public abstract class VideoPlayerUi extends PlayerUi
         final StreamInfo info = player.getCurrentStreamInfo().get();
 
         binding.qualityTextView.setVisibility(View.GONE);
-        binding.playbackSpeed.setVisibility(View.GONE);
-
         binding.playbackEndTime.setVisibility(View.GONE);
         binding.playbackLiveSync.setVisibility(View.GONE);
 
@@ -1013,8 +1011,6 @@ public abstract class VideoPlayerUi extends PlayerUi
                     break;
                 }
 
-                buildQualityMenu();
-
                 binding.qualityTextView.setVisibility(View.VISIBLE);
                 binding.surfaceView.setVisibility(View.VISIBLE);
                 // fallthrough
@@ -1025,7 +1021,6 @@ public abstract class VideoPlayerUi extends PlayerUi
         }
 
         buildPlaybackSpeedMenu();
-        binding.playbackSpeed.setVisibility(View.VISIBLE);
     }
     //endregion
 
@@ -1035,29 +1030,25 @@ public abstract class VideoPlayerUi extends PlayerUi
     //////////////////////////////////////////////////////////////////////////*/
     //region Popup menus ("popup" means that they pop up, not that they belong to the popup player)
 
-    private void buildQualityMenu() {
+    @Override
+    public void onQualityChanged(@NonNull final MediaItemTag.Quality quality) {
+        super.onQualityChanged(quality);
+
         if (qualityPopupMenu == null) {
             return;
         }
         qualityPopupMenu.getMenu().removeGroup(POPUP_MENU_ID_QUALITY);
 
-        final List<VideoStream> availableStreams = Optional.ofNullable(player.getCurrentMetadata())
-                .flatMap(MediaItemTag::getMaybeQuality)
-                .map(MediaItemTag.Quality::getSortedVideoStreams)
-                .orElse(null);
-        if (availableStreams == null) {
-            return;
-        }
-
+        final List<VideoStream> availableStreams = quality.getSortedVideoStreams();
         for (int i = 0; i < availableStreams.size(); i++) {
             final VideoStream videoStream = availableStreams.get(i);
             qualityPopupMenu.getMenu().add(POPUP_MENU_ID_QUALITY, i, Menu.NONE, MediaFormat
                     .getNameById(videoStream.getFormatId()) + " " + videoStream.getResolution());
         }
-        final VideoStream selectedVideoStream = player.getSelectedVideoStream();
-        if (selectedVideoStream != null) {
-            binding.qualityTextView.setText(selectedVideoStream.getResolution());
-        }
+
+        quality.getSelectedVideoStream()
+                .map(VideoStream::getResolution)
+                .ifPresent(binding.qualityTextView::setText);
         qualityPopupMenu.setOnMenuItemClickListener(this);
         qualityPopupMenu.setOnDismissListener(this);
     }
@@ -1165,12 +1156,11 @@ public abstract class VideoPlayerUi extends PlayerUi
         qualityPopupMenu.show();
         isSomePopupMenuVisible = true;
 
-        final VideoStream videoStream = player.getSelectedVideoStream();
-        if (videoStream != null) {
+        player.getSelectedVideoStream().ifPresent(videoStream -> {
             //noinspection SetTextI18n
             binding.qualityTextView.setText(MediaFormat.getNameById(videoStream.getFormatId())
                     + " " + videoStream.getResolution());
-        }
+        });
 
         player.saveWasPlaying();
     }
@@ -1229,10 +1219,6 @@ public abstract class VideoPlayerUi extends PlayerUi
             Log.d(TAG, "onDismiss() called with: menu = [" + menu + "]");
         }
         isSomePopupMenuVisible = false; //TODO check if this works
-        final VideoStream selectedVideoStream = player.getSelectedVideoStream();
-        if (selectedVideoStream != null) {
-            binding.qualityTextView.setText(selectedVideoStream.getResolution());
-        }
         if (player.isPlaying()) {
             hideControls(DEFAULT_CONTROLS_DURATION, 0);
             hideSystemUIIfNeeded();

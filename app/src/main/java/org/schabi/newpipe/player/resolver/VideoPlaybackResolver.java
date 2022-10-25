@@ -85,7 +85,7 @@ public class VideoPlaybackResolver implements PlaybackResolver {
         }
         final MediaItemTag tag = StreamInfoTag.of(info, videoStreamsList, index);
         @Nullable final VideoStream video = tag.getMaybeQuality()
-                .map(MediaItemTag.Quality::getSelectedVideoStream)
+                .flatMap(MediaItemTag.Quality::getSelectedVideoStream)
                 .orElse(null);
 
         if (video != null) {

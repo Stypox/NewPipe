@@ -1250,6 +1250,8 @@ public final class Player implements PlaybackListener, Listener {
             }
             final StreamInfo previousInfo = Optional.ofNullable(currentMetadata)
                     .flatMap(MediaItemTag::getMaybeStreamInfo).orElse(null);
+            final MediaItemTag.Quality previousQuality = Optional.ofNullable(currentMetadata)
+                    .flatMap(MediaItemTag::getMaybeQuality).orElse(null);
             currentMetadata = tag;
 
             if (!currentMetadata.getErrors().isEmpty()) {
@@ -1270,6 +1272,12 @@ public final class Player implements PlaybackListener, Listener {
                 if (previousInfo == null || !previousInfo.getUrl().equals(info.getUrl())) {
                     // only update with the new stream info if it has actually changed
                     updateMetadataWith(info);
+                }
+            });
+
+            currentMetadata.getMaybeQuality().ifPresent(quality -> {
+                if (quality != previousQuality) {
+                    UIs.call(ui -> ui.onQualityChanged(quality));
                 }
             });
         });
@@ -1884,23 +1892,10 @@ public final class Player implements PlaybackListener, Listener {
         loadController.disablePreloadingOfCurrentTrack();
     }
 
-    @Nullable
-    public VideoStream getSelectedVideoStream() {
-        @Nullable final MediaItemTag.Quality quality = Optional.ofNullable(currentMetadata)
+    public Optional<VideoStream> getSelectedVideoStream() {
+        return Optional.ofNullable(currentMetadata)
                 .flatMap(MediaItemTag::getMaybeQuality)
-                .orElse(null);
-        if (quality == null) {
-            return null;
-        }
-
-        final List<VideoStream> availableStreams = quality.getSortedVideoStreams();
-        final int selectedStreamIndex = quality.getSelectedVideoStreamIndex();
-
-        if (selectedStreamIndex >= 0 && availableStreams.size() > selectedStreamIndex) {
-            return availableStreams.get(selectedStreamIndex);
-        } else {
-            return null;
-        }
+                .flatMap(MediaItemTag.Quality::getSelectedVideoStream);
     }
     //endregion
 

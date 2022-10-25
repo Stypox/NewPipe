@@ -122,11 +122,11 @@ public interface MediaItemTag {
             return selectedVideoStreamIndex;
         }
 
-        @Nullable
-        public VideoStream getSelectedVideoStream() {
+        public Optional<VideoStream> getSelectedVideoStream() {
             return selectedVideoStreamIndex < 0
                     || selectedVideoStreamIndex >= sortedVideoStreams.size()
-                    ? null : sortedVideoStreams.get(selectedVideoStreamIndex);
+                    ? Optional.empty()
+                    : Optional.of(sortedVideoStreams.get(selectedVideoStreamIndex));
         }
     }
 }
