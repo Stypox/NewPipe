@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.preference.PreferenceManager;
 
+import org.schabi.newpipe.App;
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.util.DeviceUtils;
 
@@ -49,6 +50,7 @@ public final class NewPipeSettings {
         final int lastUsedPrefVersion = PreferenceManager.getDefaultSharedPreferences(context)
                 .getInt(context.getString(R.string.last_used_preferences_version), -1);
         final boolean isFirstRun = lastUsedPrefVersion == -1;
+        App.getApp().isFirstRun = isFirstRun;
 
         // first run migrations, then setDefaultValues, since the latter requires the correct types
         SettingMigrations.runMigrationsIfNeeded(context, isFirstRun);

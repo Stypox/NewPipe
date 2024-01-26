@@ -60,6 +60,8 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 public class App extends Application {
     public static final String PACKAGE_NAME = BuildConfig.APPLICATION_ID;
     private static final String TAG = App.class.toString();
+
+    public boolean isFirstRun = false;
     private static App app;
 
     @NonNull
