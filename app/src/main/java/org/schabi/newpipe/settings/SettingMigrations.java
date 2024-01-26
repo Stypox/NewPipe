@@ -13,6 +13,7 @@ import org.schabi.newpipe.error.ErrorInfo;
 import org.schabi.newpipe.error.ErrorUtil;
 import org.schabi.newpipe.error.UserAction;
 import org.schabi.newpipe.util.DeviceUtils;
+import org.schabi.newpipe.util.ReleaseVersionUtil;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -143,6 +144,16 @@ public final class SettingMigrations {
         }
     };
 
+    public static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        protected void migrate(@NonNull final Context context) {
+            final boolean isAutoUpdateCheckEnabled = sp.getBoolean("update_app_key", true);
+            if (isAutoUpdateCheckEnabled && ReleaseVersionUtil.INSTANCE.isReleaseApk()) {
+                UpdateSettingsFragment.askForConsentToUpdateChecks(context);
+            }
+        }
+    };
+
     /**
      * List of all implemented migrations.
      * <p>
@@ -156,12 +167,13 @@ public final class SettingMigrations {
             MIGRATION_3_4,
             MIGRATION_4_5,
             MIGRATION_5_6,
+            MIGRATION_6_7,
     };
 
     /**
      * Version number for preferences. Must be incremented every time a migration is necessary.
      */
-    private static final int VERSION = 6;
+    private static final int VERSION = 7;
 
 
     public static void runMigrationsIfNeeded(@NonNull final Context context) {

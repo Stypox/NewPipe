@@ -46,12 +46,20 @@ public class UpdateSettingsFragment extends BasePreferenceFragment {
                 .setMessage(context.getString(R.string.auto_update_check_description))
                 .setPositiveButton(context.getString(R.string.yes), (d, w) -> {
                     d.dismiss();
-                    PreferenceManager.getDefaultSharedPreferences(context)
-                            .edit()
-                            .putBoolean(context.getString(R.string.update_app_key), true)
-                            .apply();
+                    setAutoUpdateCheckEnabled(context, true);
                 })
-                .setNegativeButton(R.string.no, (d, w) -> d.dismiss())
+                .setNegativeButton(R.string.no, (d, w) -> {
+                    d.dismiss();
+                    // set explicitly to false, since the default is true on previous versions
+                    setAutoUpdateCheckEnabled(context, false);
+                })
                 .show();
+    }
+
+    private static void setAutoUpdateCheckEnabled(final Context context, final boolean enabled) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(context.getString(R.string.update_app_key), enabled)
+                .apply();
     }
 }
