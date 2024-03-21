@@ -45,15 +45,8 @@ public final class NewPipeSettings {
     private NewPipeSettings() { }
 
     public static void initSettings(final Context context) {
-        // check if the last used preference version is set
-        // to determine whether this is the first app run
-        final int lastUsedPrefVersion = PreferenceManager.getDefaultSharedPreferences(context)
-                .getInt(context.getString(R.string.last_used_preferences_version), -1);
-        final boolean isFirstRun = lastUsedPrefVersion == -1;
-        App.getApp().isFirstRun = isFirstRun;
-
         // first run migrations, then setDefaultValues, since the latter requires the correct types
-        SettingMigrations.runMigrationsIfNeeded(context, isFirstRun);
+        SettingMigrations.runMigrationsIfNeeded(context);
 
         // readAgain is true so that if new settings are added their default value is set
         PreferenceManager.setDefaultValues(context, R.xml.main_settings, true);
@@ -69,7 +62,7 @@ public final class NewPipeSettings {
         saveDefaultVideoDownloadDirectory(context);
         saveDefaultAudioDownloadDirectory(context);
 
-        disableMediaTunnelingIfNecessary(context, isFirstRun);
+        disableMediaTunnelingIfNecessary(context);
     }
 
     static void saveDefaultVideoDownloadDirectory(final Context context) {
@@ -147,8 +140,7 @@ public final class NewPipeSettings {
                 R.string.show_remote_search_suggestions_key);
     }
 
-    private static void disableMediaTunnelingIfNecessary(@NonNull final Context context,
-                                                         final boolean isFirstRun) {
+    private static void disableMediaTunnelingIfNecessary(@NonNull final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         final String disabledTunnelingKey = context.getString(R.string.disable_media_tunneling_key);
         final String disabledTunnelingAutomaticallyKey =
@@ -163,7 +155,7 @@ public final class NewPipeSettings {
                 prefs.getInt(disabledTunnelingAutomaticallyKey, -1) == 0
                         && !prefs.getBoolean(disabledTunnelingKey, false);
 
-        if (Boolean.TRUE.equals(isFirstRun)
+        if (App.getApp().isFirstRun()
                 || (wasDeviceBlacklistUpdated && !wasMediaTunnelingEnabledByUser)) {
             setMediaTunneling(context);
         }

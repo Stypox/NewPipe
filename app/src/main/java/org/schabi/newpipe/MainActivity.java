@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
             // if this is enabled by the user.
             NotificationWorker.initialize(this);
         }
-        if (App.getApp().isFirstRun && ReleaseVersionUtil.isReleaseApk()) {
+        if (App.getApp().isFirstRun() && ReleaseVersionUtil.INSTANCE.isReleaseApk()) {
             UpdateSettingsFragment.askForConsentToUpdateChecks(this);
         }
     }
