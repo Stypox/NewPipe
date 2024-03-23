@@ -60,6 +60,17 @@ public class UpdateSettingsFragment extends BasePreferenceFragment {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putBoolean(context.getString(R.string.update_app_key), enabled)
+                .putBoolean(context.getString(R.string.update_check_consent_key), true)
                 .apply();
+    }
+
+    /**
+     * Whether the user was asked for consent to automatically check for app updates.
+     * @param context
+     * @return true if the user was asked for consent, false otherwise
+     */
+    public static boolean wasUserAskedForConsent(final Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(context.getString(R.string.update_check_consent_key), false);
     }
 }
